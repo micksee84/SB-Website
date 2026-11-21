@@ -1,0 +1,41 @@
+name: Deploy to Wix
+
+# Every push to main puts the site/ folder live on sunshinebrigade.ca.
+# You can also run it by hand from the Actions tab.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-wix
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install the Wix CLI
+        run: npm ci
+
+      - name: Check the site files
+        run: |
+          test -f site/index.html || { echo "site/index.html is missing"; exit 1; }
+          du -sh site
+
+      - name: Log in to Wix
+        run: npx wix login --api-key "$WIX_API_KEY"
+        env:
+          WIX_API_KEY: ${{ secrets.WIX_API_KEY }}
+
+      - name: Release
+        env:
+          NOTE: ${{ github.event.head_commit.message }}
+        run: npx wix release --version-type minor --comment "$(printf '%s' "${NOTE:-Manual deploy}" | head -n1 | cut -c1-200)"

@@ -1,0 +1,15 @@
+{
+  "name": "sb-website",
+  "private": true,
+  "description": "The Sunshine Brigade website (sunshinebrigade.ca), deployed to Wix Headless hosting.",
+  "scripts": {
+    "preview": "wix preview",
+    "release": "wix release"
+  },
+  "engines": {
+    "node": ">=24.22.1"
+  },
+  "devDependencies": {
+    "@wix/cli": "1.2.14"
+  }
+}
