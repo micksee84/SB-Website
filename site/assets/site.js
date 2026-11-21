@@ -25,29 +25,38 @@ function playClip(v) {
   window.__sbClipObserver = io;
 })();
 
-// What you can make: pick a tile to see its details
+// What you can make: a list of features beside one player (ARIA tabs)
 (function () {
-  var tiles = document.querySelectorAll('[data-pick]');
-  var panels = document.querySelectorAll('[data-panel]');
-  if (!tiles.length || !panels.length) return;
-  var cur = 0;
-  function show(i, open) {
-    cur = (i + panels.length) % panels.length;
-    panels.forEach(function (p, j) {
-      var on = open && j === cur;
-      p.hidden = !on;
-      var v = p.querySelector('video.clip');
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.mk-tab'));
+  if (!tabs.length) return;
+  function select(i, focus) {
+    tabs.forEach(function (t, j) {
+      var on = j === i;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      var panel = document.getElementById(t.getAttribute('aria-controls'));
+      if (!panel) return;
+      panel.hidden = !on;
+      var v = panel.querySelector('video.clip');
       if (!v) return;
       if (on) { v.currentTime = 0; playClip(v); } else v.pause();
     });
-    tiles.forEach(function (t, j) {
-      var on = open && j === cur;
-      t.setAttribute('aria-pressed', on ? 'true' : 'false');
-      t.style.border = on ? '3px solid #2D2200' : '1.5px solid #2D2200';
-    });
+    if (focus) tabs[i].focus();
+    if (tabs[i].scrollIntoView && window.matchMedia('(max-width: 860px)').matches) {
+      tabs[i].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }
   }
-  tiles.forEach(function (t, i) { t.addEventListener('click', function () { show(i, true); }); });
-  document.querySelectorAll('[data-prev]').forEach(function (b) { b.addEventListener('click', function () { show(cur - 1, true); }); });
-  document.querySelectorAll('[data-next]').forEach(function (b) { b.addEventListener('click', function () { show(cur + 1, true); }); });
-  document.querySelectorAll('[data-close]').forEach(function (b) { b.addEventListener('click', function () { show(cur, false); }); });
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function () { select(i, false); });
+    t.addEventListener('keydown', function (e) {
+      var k = e.key, n = tabs.length, to = null;
+      if (k === 'ArrowDown' || k === 'ArrowRight') to = (i + 1) % n;
+      else if (k === 'ArrowUp' || k === 'ArrowLeft') to = (i - 1 + n) % n;
+      else if (k === 'Home') to = 0;
+      else if (k === 'End') to = n - 1;
+      if (to === null) return;
+      e.preventDefault();
+      select(to, true);
+    });
+  });
 })();
