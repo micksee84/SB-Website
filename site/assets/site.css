@@ -29,7 +29,7 @@ a{color:#2D2200}a:hover{color:#009BD9}
 .faces{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px 24px}
 .bleed{margin-right:-96px}
 .steps{position:relative}
-.steps-line{position:absolute;left:24px;right:24px;top:23px;border-top:3px dotted #2D2200;z-index:0}
+.steps-line{position:absolute;left:24px;right:calc(25% - 42px);top:23px;border-top:3px dotted #2D2200;z-index:0}
 
 /* ---------- Components ---------- */
 .btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 24px;border-radius:999px;font:800 17px/1.2 "Nunito",system-ui,sans-serif;text-decoration:none;cursor:pointer;border:1.5px solid #2D2200;transition:background-color .15s,transform .1s;box-sizing:border-box}
